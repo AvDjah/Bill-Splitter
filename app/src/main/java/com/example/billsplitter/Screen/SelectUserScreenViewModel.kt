@@ -1,0 +1,23 @@
+package com.example.billsplitter.Screen
+
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.ViewModel
+import com.example.billsplitter.models.Friend
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+
+class SelectUserScreenViewModel : ViewModel() {
+    private val _friendsList  = MutableStateFlow(mutableStateListOf<Friend>())
+    val friendsList = _friendsList
+    private var friendId = 0
+    fun addUser(name : String){
+        if(name.isEmpty()){
+            return
+        }
+        _friendsList.update {
+            it.add(Friend(name,++friendId))
+            it
+        }
+    }
+}

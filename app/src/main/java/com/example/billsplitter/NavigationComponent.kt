@@ -1,0 +1,85 @@
+package com.example.billsplitter
+
+import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
+import androidx.navigation.compose.rememberNavController
+import com.example.billsplitter.Screen.SelectUserScreen
+import com.example.billsplitter.Screen.SelectUserScreenViewModel
+import com.example.billsplitter.Screen.StartScreen
+
+
+enum class Screens {
+    START_SCREEN, SELECT_USER_SCREEN
+}
+
+enum class Dialogs {
+    ADD_FRIEND
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainNavigation(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+    val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel()
+    val frenList = selectUserScreenViewModel.friendsList.collectAsState()
+
+
+    NavHost(navController = navController, startDestination = Screens.SELECT_USER_SCREEN.name) {
+        composable(route = Screens.START_SCREEN.name) {
+            StartScreen()
+        }
+        composable(route = Screens.SELECT_USER_SCREEN.name) {
+            SelectUserScreen(
+                navController = navController,
+                selectUserScreenViewModel = selectUserScreenViewModel
+            )
+        }
+        dialog(route = Dialogs.ADD_FRIEND.name) {
+            var name = remember {
+                mutableStateOf("")
+            }
+            Dialog(
+                onDismissRequest = { /*TODO*/ }, properties = DialogProperties(
+                    dismissOnBackPress = true
+                )
+            ) {
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    TextField(value = name.value, onValueChange = { value ->
+                        name.value = value
+                    })
+                    Button(modifier = modifier.padding(8.dp), onClick = {
+                        selectUserScreenViewModel.addUser(name.value)
+                        Log.d("FRENS", frenList.value.toList().toString())
+                        navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
+                    }) {
+                        Text("Add User", textAlign = TextAlign.Center)
+                    }
+                }
+            }
+        }
+    }
+
+}
