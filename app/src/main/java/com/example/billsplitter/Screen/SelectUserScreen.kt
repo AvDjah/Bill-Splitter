@@ -23,12 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.billsplitter.Dialogs
 import com.example.billsplitter.Screens
+import com.example.billsplitter.models.Friend
 
 @Composable
 fun SelectUserScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    selectUserScreenViewModel: SelectUserScreenViewModel
+    selectUserScreenViewModel: SelectUserScreenViewModel,
+    selectFinalExpenseFriends : (List<Friend>,MutableSet<Int>) -> Unit
 ) {
 //    val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel()
     val friendsList = selectUserScreenViewModel.friendsList.collectAsState()
@@ -39,6 +41,7 @@ fun SelectUserScreen(
 //    var selectedFriends = remember {
 //        mutableStateOf(mutableSetOf<Int>())
 //    }
+
     var selectedFriends = rememberSaveable {
         mutableStateOf(mutableSetOf<Int>())
     }
@@ -82,6 +85,7 @@ fun SelectUserScreen(
             }
         }
         Button(onClick = {
+            selectFinalExpenseFriends(friendsList.value,selectedFriends.value)
             navController.navigate(Screens.ADD_EXPENSE_SCREEN.name)
         },modifier = modifier.padding(8.dp)) {
             Text("Add Items")

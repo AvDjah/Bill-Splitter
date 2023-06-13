@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.example.billsplitter.Screen.AddExpenseScreen
+import com.example.billsplitter.Screen.AddExpenseScreenViewModel
 import com.example.billsplitter.Screen.SelectUserScreen
 import com.example.billsplitter.Screen.SelectUserScreenViewModel
 import com.example.billsplitter.Screen.StartScreen
@@ -41,7 +42,9 @@ enum class Dialogs {
 fun MainNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel()
+    val addExpenseScreenViewModel: AddExpenseScreenViewModel = viewModel()
     val frenList = selectUserScreenViewModel.friendsList.collectAsState()
+    val expenseList = addExpenseScreenViewModel.expenseFriends.collectAsState()
 
 
     NavHost(navController = navController, startDestination = Screens.SELECT_USER_SCREEN.name) {
@@ -51,11 +54,18 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         composable(route = Screens.SELECT_USER_SCREEN.name) {
             SelectUserScreen(
                 navController = navController,
-                selectUserScreenViewModel = selectUserScreenViewModel
+                selectUserScreenViewModel = selectUserScreenViewModel,
+                selectFinalExpenseFriends = { list, set ->
+                    addExpenseScreenViewModel.updateFriendList(list, set)
+                    Log.d("FromNav for AddItems",expenseList.value.toList().toString())
+                }
             )
         }
-        composable(route = Screens.ADD_EXPENSE_SCREEN.name){
-                AddExpenseScreen(navController = navController)
+        composable(route = Screens.ADD_EXPENSE_SCREEN.name) {
+            AddExpenseScreen(
+                navController = navController,
+                addExpenseScreenViewModel = addExpenseScreenViewModel
+            )
         }
         dialog(route = Dialogs.ADD_FRIEND.name) {
             var name = remember {
