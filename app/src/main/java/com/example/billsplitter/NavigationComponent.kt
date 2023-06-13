@@ -1,6 +1,8 @@
 package com.example.billsplitter
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -47,24 +50,21 @@ fun MainNavigation(modifier: Modifier = Modifier) {
     val expenseList = addExpenseScreenViewModel.expenseFriends.collectAsState()
 
 
-    NavHost(navController = navController, startDestination = Screens.SELECT_USER_SCREEN.name) {
+    NavHost(navController = navController, startDestination = Screens.ADD_EXPENSE_SCREEN.name) {
         composable(route = Screens.START_SCREEN.name) {
             StartScreen()
         }
         composable(route = Screens.SELECT_USER_SCREEN.name) {
-            SelectUserScreen(
-                navController = navController,
+            SelectUserScreen(navController = navController,
                 selectUserScreenViewModel = selectUserScreenViewModel,
                 selectFinalExpenseFriends = { list, set ->
                     addExpenseScreenViewModel.updateFriendList(list, set)
-                    Log.d("FromNav for AddItems",expenseList.value.toList().toString())
-                }
-            )
+                    Log.d("FromNav for AddItems", expenseList.value.toList().toString())
+                })
         }
         composable(route = Screens.ADD_EXPENSE_SCREEN.name) {
             AddExpenseScreen(
-                navController = navController,
-                addExpenseScreenViewModel = addExpenseScreenViewModel
+                navController = navController, addExpenseScreenViewModel = addExpenseScreenViewModel
             )
         }
         dialog(route = Dialogs.ADD_FRIEND.name) {
@@ -72,7 +72,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 mutableStateOf("")
             }
             Dialog(
-                onDismissRequest = { /*TODO*/ }, properties = DialogProperties(
+                onDismissRequest = {
+                    navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
+                }, properties = DialogProperties(
                     dismissOnBackPress = true
                 )
             ) {
@@ -80,10 +82,11 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(8.dp)
+                        .background(Color.DarkGray)
                 ) {
                     TextField(value = name.value, onValueChange = { value ->
                         name.value = value
-                    })
+                    }, modifier = modifier.fillMaxWidth().padding(8.dp))
                     Button(modifier = modifier.padding(8.dp), onClick = {
                         selectUserScreenViewModel.addUser(name.value)
                         Log.d("FRENS", frenList.value.toList().toString())

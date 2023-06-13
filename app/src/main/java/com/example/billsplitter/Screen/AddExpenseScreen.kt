@@ -1,6 +1,8 @@
 package com.example.billsplitter.Screen
 
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -21,6 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -41,6 +46,11 @@ fun AddExpenseScreen(
         mutableStateOf("")
     }
 
+    var finishedSplit = remember {
+        mutableStateOf("")
+    }
+
+    val localContext = LocalContext.current
 
     Column(
         modifier = modifier
@@ -65,7 +75,14 @@ fun AddExpenseScreen(
             )
         }
         Button(onClick = {
-            navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
+            val trial = navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
+            if(!trial){
+                navController.navigate(Screens.SELECT_USER_SCREEN.name){
+                    popUpTo(Screens.ADD_EXPENSE_SCREEN.name){
+                        inclusive = true
+                    }
+                }
+            }
         }, modifier = modifier.padding(8.dp)) {
             Text("Go Back")
         }
@@ -89,9 +106,39 @@ fun AddExpenseScreen(
                     Text(item.name)
                     Checkbox(checked = checked.value, onCheckedChange = {
                         checked.value = it
+                        addExpenseScreenViewModel.updateChecklist(it, item.frenId)
                     })
                 }
             }
         }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = {
+                if(amount.value.isEmpty()){
+                    amount.value = "0"
+                }
+                addExpenseScreenViewModel.splitAExpense(amount.value.toFloat())
+                Toast.makeText(localContext, "Added to split!", Toast.LENGTH_SHORT).show()
+            }, modifier = modifier.padding(8.dp)) {
+                Text("Split this")
+            }
+            Button(onClick = {
+                val finishedResult = addExpenseScreenViewModel.getFinishedSplit()
+//                val currentChecklist = addExpenseScreenViewModel.getChecklist()
+                finishedSplit.value = finishedResult
+                Log.d("FINISHED SPLIT", finishedResult)
+            }, modifier = modifier.padding(8.dp)) {
+                Text("Finish Splitting")
+            }
+        }
+        TextField(
+            value = finishedSplit.value,
+            onValueChange = {  }, modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(4.dp)
+                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))
+        )
+//        Text(text = finishedSplit.value)
+
     }
 }

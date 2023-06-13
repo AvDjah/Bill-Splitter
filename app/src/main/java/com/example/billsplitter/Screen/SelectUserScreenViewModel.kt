@@ -9,15 +9,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class SelectUserScreenViewModel : ViewModel() {
-    private val _friendsList  = MutableStateFlow(mutableStateListOf<Friend>())
+    private val _friendsList  = MutableStateFlow(mutableStateListOf<Friend>(
+    ))
     val friendsList = _friendsList.asStateFlow()
     private var friendId = 0
     fun addUser(name : String){
         if(name.isEmpty()){
             return
         }
+        var trimmedName = name.trim()
         _friendsList.update {
-            it.add(Friend(name,++friendId))
+            it.add(Friend(trimmedName,++friendId))
             it
         }
     }
