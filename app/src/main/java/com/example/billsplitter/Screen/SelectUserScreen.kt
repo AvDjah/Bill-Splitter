@@ -15,12 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.billsplitter.Dialogs
+import com.example.billsplitter.Screens
 
 @Composable
 fun SelectUserScreen(
@@ -34,7 +36,10 @@ fun SelectUserScreen(
         mutableStateOf("")
     }
 
-    var selectedFriends = remember {
+//    var selectedFriends = remember {
+//        mutableStateOf(mutableSetOf<Int>())
+//    }
+    var selectedFriends = rememberSaveable {
         mutableStateOf(mutableSetOf<Int>())
     }
     Column(
@@ -52,6 +57,9 @@ fun SelectUserScreen(
             items(friendsList.value) { item ->
                 var checked = remember {
                     mutableStateOf(false)
+                }
+                if(selectedFriends.value.contains(item.frenId)){
+                    checked.value = true
                 }
                 Row(
                     modifier = modifier
@@ -72,6 +80,11 @@ fun SelectUserScreen(
                     })
                 }
             }
+        }
+        Button(onClick = {
+            navController.navigate(Screens.ADD_EXPENSE_SCREEN.name)
+        },modifier = modifier.padding(8.dp)) {
+            Text("Add Items")
         }
         Button(onClick = {
                          showSelected.value = ""

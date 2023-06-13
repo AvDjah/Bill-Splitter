@@ -22,13 +22,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import com.example.billsplitter.Screen.AddExpenseScreen
 import com.example.billsplitter.Screen.SelectUserScreen
 import com.example.billsplitter.Screen.SelectUserScreenViewModel
 import com.example.billsplitter.Screen.StartScreen
 
 
 enum class Screens {
-    START_SCREEN, SELECT_USER_SCREEN
+    START_SCREEN, SELECT_USER_SCREEN, ADD_EXPENSE_SCREEN
 }
 
 enum class Dialogs {
@@ -52,6 +53,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 navController = navController,
                 selectUserScreenViewModel = selectUserScreenViewModel
             )
+        }
+        composable(route = Screens.ADD_EXPENSE_SCREEN.name){
+                AddExpenseScreen(navController = navController)
         }
         dialog(route = Dialogs.ADD_FRIEND.name) {
             var name = remember {
