@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +31,8 @@ import com.example.billsplitter.Screen.AddExpenseScreenViewModel
 import com.example.billsplitter.Screen.SelectUserScreen
 import com.example.billsplitter.Screen.SelectUserScreenViewModel
 import com.example.billsplitter.Screen.StartScreen
+import com.example.billsplitter.models.Friend
+import kotlinx.coroutines.launch
 
 
 enum class Screens {
@@ -44,13 +47,13 @@ enum class Dialogs {
 @Composable
 fun MainNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel()
+    val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val addExpenseScreenViewModel: AddExpenseScreenViewModel = viewModel()
     val frenList = selectUserScreenViewModel.friendsList.collectAsState()
     val expenseList = addExpenseScreenViewModel.expenseFriends.collectAsState()
 
 
-    NavHost(navController = navController, startDestination = Screens.ADD_EXPENSE_SCREEN.name) {
+    NavHost(navController = navController, startDestination = Screens.SELECT_USER_SCREEN.name) {
         composable(route = Screens.START_SCREEN.name) {
             StartScreen()
         }
@@ -78,6 +81,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                     dismissOnBackPress = true
                 )
             ) {
+                val coroutineScope = rememberCoroutineScope()
                 Column(
                     modifier = modifier
                         .fillMaxWidth()
@@ -86,10 +90,17 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                 ) {
                     TextField(value = name.value, onValueChange = { value ->
                         name.value = value
-                    }, modifier = modifier.fillMaxWidth().padding(8.dp))
+                    }, modifier = modifier
+                        .fillMaxWidth()
+                        .padding(8.dp))
                     Button(modifier = modifier.padding(8.dp), onClick = {
+                          coroutineScope.launch {
+                              selectUserScreenViewModel.saveFriend(Friend(
+                                  name.value,0
+                              ))
+                          }
                         selectUserScreenViewModel.addUser(name.value)
-                        Log.d("FRENS", frenList.value.toList().toString())
+//                        Log.d("FRENS", frenList.value.toList().toString())
                         navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
                     }) {
                         Text("Add User", textAlign = TextAlign.Center)

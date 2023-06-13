@@ -23,15 +23,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.billsplitter.Screens
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AddExpenseScreen(
     modifier: Modifier = Modifier,
@@ -76,9 +83,9 @@ fun AddExpenseScreen(
         }
         Button(onClick = {
             val trial = navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
-            if(!trial){
-                navController.navigate(Screens.SELECT_USER_SCREEN.name){
-                    popUpTo(Screens.ADD_EXPENSE_SCREEN.name){
+            if (!trial) {
+                navController.navigate(Screens.SELECT_USER_SCREEN.name) {
+                    popUpTo(Screens.ADD_EXPENSE_SCREEN.name) {
                         inclusive = true
                     }
                 }
@@ -113,7 +120,7 @@ fun AddExpenseScreen(
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = {
-                if(amount.value.isEmpty()){
+                if (amount.value.isEmpty()) {
                     amount.value = "0"
                 }
                 addExpenseScreenViewModel.splitAExpense(amount.value.toFloat())
@@ -130,13 +137,18 @@ fun AddExpenseScreen(
                 Text("Finish Splitting")
             }
         }
+        val gradientColors = listOf(Cyan, Color.Blue, Color.White)
         TextField(
             value = finishedSplit.value,
-            onValueChange = {  }, modifier = Modifier
+            onValueChange = { },
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .padding(4.dp)
-                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))
+                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp)),
+            textStyle = TextStyle(
+                brush = Brush.linearGradient(colors = gradientColors)
+            ), readOnly = true
         )
 //        Text(text = finishedSplit.value)
 

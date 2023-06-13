@@ -34,6 +34,8 @@ fun SelectUserScreen(
 ) {
 //    val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel()
     val friendsList = selectUserScreenViewModel.friendsList.collectAsState()
+    val fflist = selectUserScreenViewModel.friendsUiList.collectAsState()
+
     val showSelected = remember {
         mutableStateOf("")
     }
@@ -57,7 +59,7 @@ fun SelectUserScreen(
             Text(text = "Add Friend", textAlign = TextAlign.Center)
         }
         LazyColumn(modifier = modifier.fillMaxWidth()) {
-            items(friendsList.value) { item ->
+            items(fflist.value.friendsList) { item ->
                 var checked = remember {
                     mutableStateOf(false)
                 }
@@ -85,7 +87,7 @@ fun SelectUserScreen(
             }
         }
         Button(onClick = {
-            selectFinalExpenseFriends(friendsList.value,selectedFriends.value)
+            selectFinalExpenseFriends(fflist.value.friendsList,selectedFriends.value)
             navController.navigate(Screens.ADD_EXPENSE_SCREEN.name)
         },modifier = modifier.padding(8.dp)) {
             Text("Add Items")

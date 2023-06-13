@@ -1,6 +1,12 @@
 package com.example.billsplitter.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "friends")
 data class Friend(
     val name : String = "",
-    val frenId : Int = 0
+    @PrimaryKey(autoGenerate = true)
+    val frenId : Int
 )
+
