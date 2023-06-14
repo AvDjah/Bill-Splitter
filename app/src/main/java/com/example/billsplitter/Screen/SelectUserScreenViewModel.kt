@@ -28,6 +28,10 @@ class SelectUserScreenViewModel(private val friendsRepository: FriendsRepository
         initialValue = SelectUserScreenState()
     )
 
+    suspend fun deleteFriend(friend : Friend ){
+        friendsRepository.deleteFriend(friend)
+    }
+
     private val _friendsList = MutableStateFlow(
         mutableStateListOf<Friend>(
         )

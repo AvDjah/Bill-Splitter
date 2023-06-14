@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -96,7 +97,7 @@ fun AddExpenseScreen(
         LazyColumn(
             modifier = modifier
                 .padding(8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth().height(300.dp)
         ) {
             items(expenseFriends.value) { item ->
                 var checked = remember {
@@ -137,7 +138,7 @@ fun AddExpenseScreen(
                 Text("Finish Splitting")
             }
         }
-        val gradientColors = listOf(Cyan, Color.Blue, Color.White)
+        val gradientColors = listOf(Cyan, Color.Blue)
         TextField(
             value = finishedSplit.value,
             onValueChange = { },
@@ -147,7 +148,8 @@ fun AddExpenseScreen(
                 .padding(4.dp)
                 .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp)),
             textStyle = TextStyle(
-                brush = Brush.linearGradient(colors = gradientColors)
+                brush = Brush.linearGradient(colors = gradientColors),
+                fontSize = MaterialTheme.typography.bodyLarge.fontSize
             ), readOnly = true
         )
 //        Text(text = finishedSplit.value)

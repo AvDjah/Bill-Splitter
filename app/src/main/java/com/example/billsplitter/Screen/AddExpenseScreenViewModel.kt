@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.update
 import kotlin.math.exp
 
 class AddExpenseScreenViewModel : ViewModel() {
+
+
     private var _expenseFriends = MutableStateFlow(
         mutableListOf<Friend>()
     )
