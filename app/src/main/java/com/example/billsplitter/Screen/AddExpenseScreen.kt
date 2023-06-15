@@ -21,8 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -60,6 +62,10 @@ fun AddExpenseScreen(
         mutableStateOf("")
     }
 
+    var description by remember {
+        mutableStateOf("")
+    }
+
     val localContext = LocalContext.current
 
     Column(
@@ -68,6 +74,22 @@ fun AddExpenseScreen(
             .padding(8.dp)
     ) {
         Text("Add Item")
+        Row(
+            modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Description:")
+            TextField(
+                value = description, onValueChange = {
+                    description = it
+                }, modifier = modifier
+                    .padding(8.dp)
+                    .height(50.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text
+                )
+            )
+        }
         Row(
             modifier = modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -99,7 +121,8 @@ fun AddExpenseScreen(
         LazyColumn(
             modifier = modifier
                 .padding(8.dp)
-                .fillMaxWidth().height(300.dp)
+                .fillMaxWidth()
+                .height(300.dp)
         ) {
             items(expenseFriends.value) { item ->
                 var checked = remember {
@@ -136,7 +159,7 @@ fun AddExpenseScreen(
                     amount.value = "0"
                 }
                 val finishedResult = addExpenseScreenViewModel.getFinishedSplit()
-                addExpenseScreenViewModel.addFinishedMap(amount.value.toFloat())
+                addExpenseScreenViewModel.addFinishedMap(description.ifEmpty { "Kharcha" })
 //                val currentChecklist = addExpenseScreenViewModel.getChecklist()
                 finishedSplit.value = finishedResult
                 Log.d("FINISHED SPLIT", finishedResult)

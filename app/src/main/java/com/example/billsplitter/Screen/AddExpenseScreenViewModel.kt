@@ -68,7 +68,7 @@ class AddExpenseScreenViewModel(private val expenseRepository: ExpenseRepository
     }
 
 
-    fun addFinishedMap(amount: Float) {
+    fun addFinishedMap(description : String) {
         var jsonMap = Json.encodeToString(expenseShares)
 
         var amt = 0f
@@ -83,14 +83,15 @@ class AddExpenseScreenViewModel(private val expenseRepository: ExpenseRepository
                     Expense(
                         amount = amt,
                         expenseShares = jsonMap,
-                        id = currentExpenseId
+                        id = currentExpenseId,
+                        description = description
                     )
                 )
             }
         } else {
             viewModelScope.launch {
                 val id =
-                    expenseRepository.insertExpense(Expense(amount = amt, expenseShares = jsonMap))
+                    expenseRepository.insertExpense(Expense(amount = amt, expenseShares = jsonMap, description = description))
                 currentExpenseId = id.toInt()
                 Log.d("NEW RECORD", id.toString())
             }

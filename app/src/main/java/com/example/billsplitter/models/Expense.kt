@@ -8,5 +8,6 @@ data class Expense(
     @PrimaryKey(autoGenerate = true)
     var id : Int = 0,
     var amount : Float,
-    var expenseShares : String
+    var expenseShares : String,
+    var description : String = "No Description"
 )

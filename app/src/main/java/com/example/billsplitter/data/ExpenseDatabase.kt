@@ -8,7 +8,7 @@ import com.example.billsplitter.models.Expense
 import com.example.billsplitter.models.ExpenseDao
 import com.example.billsplitter.models.FriendDAO
 
-@Database(entities = [Expense::class], version = 2, exportSchema = false)
+@Database(entities = [Expense::class], version = 3, exportSchema = false)
 abstract class ExpenseDatabase : RoomDatabase(){
     abstract fun expenseDao() : ExpenseDao
 
