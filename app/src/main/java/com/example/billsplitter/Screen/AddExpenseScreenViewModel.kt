@@ -2,19 +2,25 @@ package com.example.billsplitter.Screen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.billsplitter.data.ExpenseRepository
+import com.example.billsplitter.models.Expense
 import com.example.billsplitter.models.Friend
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.math.exp
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-class AddExpenseScreenViewModel : ViewModel() {
+class AddExpenseScreenViewModel(private val expenseRepository: ExpenseRepository) : ViewModel() {
 
 
     private var _expenseFriends = MutableStateFlow(
         mutableListOf<Friend>()
     )
-//    private var _expenseFriends = MutableStateFlow(
+
+    //    private var _expenseFriends = MutableStateFlow(
 //        mutableListOf<Friend>(
 //            Friend("Arvind", 0),
 //            Friend("Diljit", 1),
@@ -23,9 +29,11 @@ class AddExpenseScreenViewModel : ViewModel() {
 //            Friend("Karmine", 5)
 //        )
 //    )
-    var expenseShares: MutableMap<Int, Float> = mutableMapOf()
+    private var expenseShares: MutableMap<Int, Float> = mutableMapOf()
     var currentChecklist: MutableMap<Int, Boolean> = mutableMapOf()
     var expenseFriends = _expenseFriends.asStateFlow()
+    var currentExpenseId: Int = -1
+
 
     init {
         if (_expenseFriends.value.size != expenseShares.size) {
@@ -38,6 +46,57 @@ class AddExpenseScreenViewModel : ViewModel() {
             currentChecklist.putAll(expenseFriends.value.map { Pair(it.frenId, false) })
         }
     }
+
+
+    fun setExpense(
+        id: Int,
+        amount: Float,
+        map: MutableMap<Int, Float>,
+        names: MutableMap<Int, String>
+    ) {
+        Log.d("From Set expense", names.toString())
+        currentExpenseId = id
+        expenseShares = map
+        currentChecklist.clear()
+        currentChecklist.putAll(expenseShares.map {
+            Pair(it.key, false)
+        })
+        expenseFriends.value.clear()
+        expenseFriends.value.addAll(expenseShares.map {
+            Friend(name = names[it.key] ?: "No Name", frenId = it.key)
+        })
+    }
+
+
+    fun addFinishedMap(amount: Float) {
+        var jsonMap = Json.encodeToString(expenseShares)
+
+        var amt = 0f
+        for (i in expenseShares) {
+            amt += i.value
+        }
+
+        if (currentExpenseId != -1) {
+            Log.d("CURRENT expense id", currentExpenseId.toString())
+            viewModelScope.launch {
+                val id = expenseRepository.updateExpense(
+                    Expense(
+                        amount = amt,
+                        expenseShares = jsonMap,
+                        id = currentExpenseId
+                    )
+                )
+            }
+        } else {
+            viewModelScope.launch {
+                val id =
+                    expenseRepository.insertExpense(Expense(amount = amt, expenseShares = jsonMap))
+                currentExpenseId = id.toInt()
+                Log.d("NEW RECORD", id.toString())
+            }
+        }
+    }
+
 
     fun updateFriendList(friendsList: List<Friend>, selectedFriend: MutableSet<Int>) {
         val tempList = mutableListOf<Friend>()
@@ -53,7 +112,7 @@ class AddExpenseScreenViewModel : ViewModel() {
         }
     }
 
-    fun updateChecklist(value : Boolean, frenId : Int){
+    fun updateChecklist(value: Boolean, frenId: Int) {
         currentChecklist[frenId] = value
     }
 
@@ -65,13 +124,13 @@ class AddExpenseScreenViewModel : ViewModel() {
 //        }
 
         var totalMembers = 0
-        for(i in currentChecklist){
-            if(i.value)
+        for (i in currentChecklist) {
+            if (i.value)
                 totalMembers += 1
         }
         val share = amount / totalMembers
-        for(i in expenseShares){
-            if(currentChecklist[i.key] == true){
+        for (i in expenseShares) {
+            if (currentChecklist[i.key] == true) {
                 expenseShares[i.key] = i.value + share
             }
         }
@@ -90,7 +149,7 @@ class AddExpenseScreenViewModel : ViewModel() {
     }
 
     //Used For checking if the checklist is updating correctly
-    fun getChecklist() : String {
+    fun getChecklist(): String {
         var split = ""
         for (i in currentChecklist) {
             split += i.key
@@ -100,7 +159,6 @@ class AddExpenseScreenViewModel : ViewModel() {
         }
         return split
     }
-
 
 
 }

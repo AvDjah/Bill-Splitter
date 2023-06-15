@@ -1,7 +1,6 @@
 package com.example.billsplitter
 
 import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +30,9 @@ import com.example.billsplitter.Screen.AddExpenseScreenViewModel
 import com.example.billsplitter.Screen.SelectUserScreen
 import com.example.billsplitter.Screen.SelectUserScreenViewModel
 import com.example.billsplitter.Screen.StartScreen
+import com.example.billsplitter.Screen.StartScreenViewModel
 import com.example.billsplitter.models.Friend
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -47,15 +48,30 @@ enum class Dialogs {
 @Composable
 fun MainNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val selectUserScreenViewModel: SelectUserScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
-    val addExpenseScreenViewModel: AddExpenseScreenViewModel = viewModel()
+    val selectUserScreenViewModel: SelectUserScreenViewModel =
+        viewModel(factory = AppViewModelProvider.Factory)
+    val addExpenseScreenViewModel: AddExpenseScreenViewModel =
+        viewModel(factory = AppViewModelProvider.Factory)
+    val startScreenViewModel: StartScreenViewModel =
+        viewModel(factory = AppViewModelProvider.Factory)
     val frenList = selectUserScreenViewModel.friendsList.collectAsState()
     val expenseList = addExpenseScreenViewModel.expenseFriends.collectAsState()
-
-
-    NavHost(navController = navController, startDestination = Screens.SELECT_USER_SCREEN.name) {
+    val coroutineScope = rememberCoroutineScope()
+    NavHost(navController = navController, startDestination = Screens.START_SCREEN.name) {
         composable(route = Screens.START_SCREEN.name) {
-            StartScreen()
+            StartScreen(
+                startScreenViewModel = startScreenViewModel,
+                navController = navController,
+                setExpenseItem = { id, amount, map ->
+                    coroutineScope.launch {
+                        val names : MutableMap<Int,String> = mutableMapOf()
+                        for(i in map){
+                            names[i.key] = selectUserScreenViewModel.getFriendName(i.key)
+                        }
+                        addExpenseScreenViewModel.setExpense(id, amount, map, names)
+                    }
+//                addExpenseScreenViewModel.setExpense(id,amount,map)
+                })
         }
         composable(route = Screens.SELECT_USER_SCREEN.name) {
             SelectUserScreen(navController = navController,
@@ -88,17 +104,21 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                         .padding(8.dp)
                         .background(Color.DarkGray)
                 ) {
-                    TextField(value = name.value, onValueChange = { value ->
-                        name.value = value
-                    }, modifier = modifier
-                        .fillMaxWidth()
-                        .padding(8.dp))
+                    TextField(
+                        value = name.value, onValueChange = { value ->
+                            name.value = value
+                        }, modifier = modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
                     Button(modifier = modifier.padding(8.dp), onClick = {
-                          coroutineScope.launch {
-                              selectUserScreenViewModel.saveFriend(Friend(
-                                  name.value,0
-                              ))
-                          }
+                        coroutineScope.launch {
+                            selectUserScreenViewModel.saveFriend(
+                                Friend(
+                                    name.value, 0
+                                )
+                            )
+                        }
                         selectUserScreenViewModel.addUser(name.value)
 //                        Log.d("FRENS", frenList.value.toList().toString())
                         navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)

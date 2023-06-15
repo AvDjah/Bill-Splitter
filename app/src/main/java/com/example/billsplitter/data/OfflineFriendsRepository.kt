@@ -9,10 +9,13 @@ class OfflineFriendsRepository(private val friendDAO: FriendDAO) : FriendsReposi
 
     override fun getFriendStream(id: Int): Flow<Friend?> = friendDAO.getFriend(id)
 
-    override suspend fun insertFriend(friend: Friend) = friendDAO.insert(friend)
+    override suspend fun insertFriend(friend: Friend) : Long = friendDAO.insert(friend)
 
     override suspend fun deleteFriend(friend: Friend) = friendDAO.delete(friend)
 
     override suspend fun updateFriend(friend: Friend) = friendDAO.update(friend)
+
+    override fun getFriendName(id: Int): Flow<String?> = friendDAO.getFriendName(id)
+
 
 }

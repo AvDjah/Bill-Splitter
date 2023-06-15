@@ -8,9 +8,11 @@ interface FriendsRepository {
 
     fun getFriendStream(id : Int) : Flow<Friend?>
 
-    suspend fun insertFriend(friend: Friend)
+    suspend fun insertFriend(friend: Friend) : Long
 
     suspend fun deleteFriend(friend: Friend)
 
     suspend fun updateFriend(friend: Friend)
+
+    fun getFriendName(id : Int) : Flow<String?>
 }

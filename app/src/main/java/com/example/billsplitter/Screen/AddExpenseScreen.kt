@@ -38,6 +38,8 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.billsplitter.Screens
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -83,7 +85,7 @@ fun AddExpenseScreen(
             )
         }
         Button(onClick = {
-            val trial = navController.popBackStack(Screens.SELECT_USER_SCREEN.name, false)
+            val trial = navController.popBackStack()
             if (!trial) {
                 navController.navigate(Screens.SELECT_USER_SCREEN.name) {
                     popUpTo(Screens.ADD_EXPENSE_SCREEN.name) {
@@ -130,7 +132,11 @@ fun AddExpenseScreen(
                 Text("Split this")
             }
             Button(onClick = {
+                if (amount.value.isEmpty()) {
+                    amount.value = "0"
+                }
                 val finishedResult = addExpenseScreenViewModel.getFinishedSplit()
+                addExpenseScreenViewModel.addFinishedMap(amount.value.toFloat())
 //                val currentChecklist = addExpenseScreenViewModel.getChecklist()
                 finishedSplit.value = finishedResult
                 Log.d("FINISHED SPLIT", finishedResult)

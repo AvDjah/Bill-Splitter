@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FriendDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(friend : Friend)
+    suspend fun insert(friend : Friend) : Long
     @Update
     suspend fun update(friend : Friend)
     @Delete
@@ -20,4 +20,6 @@ interface FriendDAO {
     fun getFriend(id : Int) : Flow<Friend>
     @Query("SELECT * from friends")
     fun getAllFriends() : Flow<List<Friend>>
+    @Query("SELECT name from friends where frenId = :id")
+    fun getFriendName(id : Int) : Flow<String>
 }

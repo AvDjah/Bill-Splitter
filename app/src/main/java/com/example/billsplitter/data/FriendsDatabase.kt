@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.billsplitter.models.Friend
 import com.example.billsplitter.models.FriendDAO
 
-@Database(entities = [Friend::class], version = 1, exportSchema = false)
+@Database(entities = [Friend::class], version = 2, exportSchema = false)
 abstract class FriendsDatabase : RoomDatabase() {
     abstract fun friendDao() : FriendDAO
 

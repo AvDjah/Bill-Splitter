@@ -1,5 +1,6 @@
 package com.example.billsplitter.Screen
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class SelectUserScreenViewModel(private val friendsRepository: FriendsRepository) : ViewModel() {
 
@@ -28,7 +30,15 @@ class SelectUserScreenViewModel(private val friendsRepository: FriendsRepository
         initialValue = SelectUserScreenState()
     )
 
-    suspend fun deleteFriend(friend : Friend ){
+
+
+    suspend fun getFriendName(id : Int) : String {
+        var record = friendsRepository.getFriendStream(id)
+        Log.d("GETNAME2",record.stateIn(viewModelScope).value.toString())
+        return record.stateIn(viewModelScope).value?.name ?: "No name"
+    }
+
+    suspend fun deleteFriend(friend: Friend) {
         friendsRepository.deleteFriend(friend)
     }
 
